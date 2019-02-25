@@ -40,7 +40,7 @@ const convertToJSON = buffer => {
 //write file 
 const writeNewFile = inputFile => {
 
-    fs.writeFile('./assets/testWrite.bmp', inputFile, (err) => {
+    fs.writeFile('./assets/testFile.bmp', inputFile, (err) => {
         if(err){
             throw err;
         }
@@ -57,13 +57,31 @@ const readFile = file => {
         }
 
         let newBitmap = new Bitmap(data);
+       // console.log(newBitmap);
 
+    
      newBitmap.parse(data);
 
-     console.log(newBitmap);
 
+        // console.log(newBitmap);
+       // console.log(newBitmap.offset);
+       //console.log(newBitmap.colorArray);
 
-    writeNewFile(data);
+       let colorArrayJson = convertToJSON(newBitmap.colorArray);
+
+       console.log(colorArrayJson.data);
+
+        for(let i = 0; i < colorArrayJson.data; i++){
+           if(colorArrayJson.data[i] == 0){
+               colorArrayJson.data[i] = 255;
+           }
+        }
+
+        console.log(colorArrayJson.data);
+        newBitmap.colorArray = colorArrayJson;
+        writeNewFile(data);
+
+    
         
     });
     
