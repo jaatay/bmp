@@ -145,5 +145,5 @@ const readFile = (file, transformation) => {
 
 }
 
-readFile('./assets/baldy.bmp', neonTransform2);
+readFile('./assets/baldy.bmp', reverseTransform);
 
