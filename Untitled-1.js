@@ -130,9 +130,9 @@ const readFile = (file, transformation) => {
        let colorArray = data.slice(54, newBitmap.offset);
        console.log(colorArray);
 
-       //pixel array
-       let pixelArray = data.slice(newBitmap.pixelArray, 14068);
-       console.log(pixelArray);
+    //    //pixel array
+    //    let pixelArray = data.slice(newBitmap.pixelArray, 14068);
+    //    console.log(pixelArray);
 
 
        transformation(colorArray);
