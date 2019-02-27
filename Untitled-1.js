@@ -25,22 +25,9 @@ class Bitmap{
     }
 }
 
+const writeNewFile = (inputFile, transformation) => {
 
-//make something into a buffer
-const bufferize = file => {
-    return Buffer.from(file);
-}
-
-//convert to JSON
-const convertToJSON = buffer => {
-    return buffer.toJSON();
-}
-
-//write file 
-//write file 
-const writeNewFile = inputFile => {
-
-    fs.writeFile('./assets/testFile.bmp', inputFile, (err) => {
+    fs.writeFile(`./assets/${transformation}.bmp`, inputFile, (err) => {
         if(err){
             throw err;
         }
@@ -49,60 +36,57 @@ const writeNewFile = inputFile => {
 }
 
 // test transformations
-const testTransform = (colorArray) => {
-    for(let i = 0; i < colorArray.length; i++){
-        if(colorArray[i] === 0){
-            colorArray[i] = 255;
+
+class Transform{
+    constructor(colorArray){
+        this.colorArray = colorArray;
+    }
+
+    negative(){
+        let reverseCounter = this.colorArray.length - 1;
+        for(let i = 0; i < this.colorArray.length; i++){
+            this.colorArray[i] = reverseCounter;
+            reverseCounter --;
         }
-     }
-}
+    };
 
-const allTransform = (colorArray) => {
-    for(let i = 0; i < colorArray.length; i++){
-        colorArray[i] = 0;
-    }
-}
+    pinkHighlights(){
+        for(let i = 0; i < this.colorArray.length; i++){
+            if(this.colorArray[i] === 0){
+                this.colorArray[i] = 255;
+            }
+         }
+    };
 
-const allTransformWhite = (colorArray) => {
-    for(let i = 0; i < colorArray.length; i++){
-        colorArray[i] = 255;
-     }
-}
+    allBlack(){
+        for(let i = 0; i < this.colorArray.length; i++){
+            this.colorArray[i] = 0;
+        }
+    };
 
-const reverseTransform = (colorArray) => {
-    let reverseCounter = colorArray.length - 1;
-    for(let i = 0; i < colorArray.length; i++){
-        colorArray[i] = reverseCounter;
-        reverseCounter --;
-    }
-}
+    allWhite(){
+        for(let i = 0; i < this.colorArray.length; i++){
+            this.colorArray[i] = 255;
+         }
+    };
 
-const neonTransform = (colorArray) => {
+    neon1(){
 
-    for(let i = 0; i < colorArray.length; i+=3){
-        colorArray[i] = 0;
-        colorArray[i + 1] = 191;
-        colorArray[i + 2] = 255;
-    }
-}
+        for(let i = 0; i < this.colorArray.length; i+=3){
+            this.colorArray[i] = 0;
+            this.colorArray[i + 1] = 191;
+            this.colorArray[i + 2] = 255;
+        }
+    };
 
-const neonTransform2 = (colorArray) => {
+    neon2(){
 
-    for(let i = 0; i < colorArray.length; i+=3){
-        colorArray[i] = 255;
-        colorArray[i + 1] = 0;
-        colorArray[i + 2] = 191;
-        colorArray[i + 3] = 0;
-    }
-}
-
-//pixel array transform
-
-const pixelTransform = (pixelArray) => {
-    let reverseCounter = pixelArray.length - 1;
-    for(let i = 0; i < pixelArray.length; i++){
-        pixelArray[i] = reverseCounter;
-        reverseCounter --;
+        for(let i = 0; i < this.colorArray.length; i+=3){
+            this.colorArray[i] = 255;
+            this.colorArray[i + 1] = 0;
+            this.colorArray[i + 2] = 191;
+            this.colorArray[i + 3] = 0;
+        }
     }
 }
 
@@ -115,28 +99,42 @@ const readFile = (file, transformation) => {
             throw err;
         }
 
+        //create parseable file
         let newBitmap = new Bitmap(data);
-    
-     newBitmap.parse(data);
 
+        //parse
+        newBitmap.parse(data);
 
-       console.log(newBitmap.offset);
-      // console.log(newBitmap.colorArray);
-      console.log(newBitmap.pixelArray);
-
-
-      
-        //color array
+        //create constructor from parsed color array
        let colorArray = data.slice(54, newBitmap.offset);
-       console.log(colorArray);
+       let transformConstructor = new Transform(colorArray);
 
-    //    //pixel array
-    //    let pixelArray = data.slice(newBitmap.pixelArray, 14068);
-    //    console.log(pixelArray);
+       //transform based on input string
+       
+        if(transformation.toLowerCase() === 'negative'){
+            transformConstructor.negative();
+        }
 
+        if(transformation.toLowerCase() === 'pinkhighlights'){
+            transformConstructor.pinkHighlights();
+        }
 
-       transformation(colorArray);
-        writeNewFile(data);
+        if(transformation.toLowerCase() === 'allblack'){
+            transformConstructor.allBlack();
+        }
+       
+        if(transformation.toLowerCase() === 'allwhite'){
+            transformConstructor.allWhite();
+        }
+
+        if(transformation.toLowerCase() === 'neon1'){
+            transformConstructor.neon1();
+        }
+       
+        if(transformation.toLowerCase() === 'neon2'){
+            transformConstructor.neon2();
+        }
+        writeNewFile(data, transformation);
 
     
         
@@ -145,5 +143,9 @@ const readFile = (file, transformation) => {
 
 }
 
-readFile('./assets/baldy.bmp', reverseTransform);
+//gets arguments from console input
+const [file, transformation] = process.argv.slice(2);
+
+//reads file based on console input
+readFile(file, transformation);
 
